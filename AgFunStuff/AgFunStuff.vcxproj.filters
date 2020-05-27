@@ -1,0 +1,47 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;c++;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Source Files\CBase">
+      <UniqueIdentifier>{b5832f07-ae15-442d-9c48-c25cf96c676b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\CPrecomp">
+      <UniqueIdentifier>{38b978ad-9f82-4096-a281-7cf79e729a8b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\CApp">
+      <UniqueIdentifier>{28134af8-1073-44d7-9e98-74a9128b79ea}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="main.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CBase.cpp">
+      <Filter>Source Files\CBase</Filter>
+    </ClCompile>
+    <ClCompile Include="CPrecomp.cpp">
+      <Filter>Source Files\CPrecomp</Filter>
+    </ClCompile>
+    <ClCompile Include="CApp.cpp">
+      <Filter>Source Files\CApp</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="CBase.h">
+      <Filter>Source Files\CBase</Filter>
+    </ClInclude>
+    <ClInclude Include="CPrecomp.h">
+      <Filter>Source Files\CPrecomp</Filter>
+    </ClInclude>
+    <ClInclude Include="CApp.h">
+      <Filter>Source Files\CApp</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>
