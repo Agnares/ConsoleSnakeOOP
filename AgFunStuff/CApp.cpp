@@ -1,6 +1,10 @@
 ﻿#include "CPrecomp.h"
 #include "CApp.h"
 
+/*		CREATED BY AGNARES										*/
+/*      27.05.2020												*/
+/*		SHARE, EDIT, LEARN, DO WHATEVER YOU WANT WITH THIS		*/	
+
 #define BORDER_WIDTH	(const int)50
 #define BORDER_HEIGHT	(const int)25
 
