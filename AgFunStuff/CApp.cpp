@@ -278,6 +278,10 @@ void TestApp::DisplayFps()
 	if((std::chrono::system_clock::now() - tp_fps) > 1000ms)
 	{
 		tp_fps = std::chrono::system_clock::now();
+		for (int i = (BORDER_WIDTH + 1); i < (BORDER_WIDTH + 1) + 10; ++i)
+		{
+			m_Screen[i] = ' ';
+		}
 		wsprintfW(&m_Screen[0 * m_nWidth + (BORDER_WIDTH + 1)], L"FPS: %d", fps);
 		fps = 0;
 	}
