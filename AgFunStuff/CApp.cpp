@@ -40,7 +40,7 @@ TestApp::TestApp(int nWidth, int nHeight)
 	m_Hearts = new wchar_t[m_nLives];
 	m_Screen = new wchar_t[m_nWidth * m_nHeight];
 
-	ClearBuffer();
+	ClearBuffer(0, m_nWidth * m_nHeight);
 }
 
 // destructor
@@ -82,9 +82,9 @@ void TestApp::GenerateFruit()
 }
 
 // clearing whole buffer length
-void TestApp::ClearBuffer()
+void TestApp::ClearBuffer(const int& nFrom, const int& nTo)
 {
-	for (unsigned int i = 0; i < m_nWidth * m_nHeight; ++i)
+	for (int i = nFrom; i < nTo; ++i)
 	{
 		m_Screen[i] = ' ';
 	}
@@ -187,7 +187,6 @@ void TestApp::CheckHit()
 
 		// snake body part
 		static unsigned int segmentCounter;
-		wsprintfW(&m_Screen[3 * m_nWidth + (BORDER_WIDTH + 1)], L"SEGMENT: %d", segmentCounter);
 		for (unsigned int i = 0; i < vTail.size(); ++i)
 		{
 			if (segmentCounter == i)
@@ -259,7 +258,7 @@ void TestApp::CheckHit()
 // displaying main game over screen
 void TestApp::DisplayGameOver()
 {
-	ClearBuffer();
+	ClearBuffer(0, m_nWidth * m_nHeight);
 	wsprintfW(&m_Screen[11 * m_nWidth + 40], L"+-----------------------------------+");
 	wsprintfW(&m_Screen[12 * m_nWidth + 40], L" GAMEOVER PRESS ENTER TO PLAY AGAIN!" );
 	wsprintfW(&m_Screen[13 * m_nWidth + 40], L" YOUR SCORE: %d", m_nScore		     );
@@ -278,10 +277,7 @@ void TestApp::DisplayFps()
 	if((std::chrono::system_clock::now() - tp_fps) > 1000ms)
 	{
 		tp_fps = std::chrono::system_clock::now();
-		for (int i = (BORDER_WIDTH + 1); i < (BORDER_WIDTH + 1) + 10; ++i)
-		{
-			m_Screen[i] = ' ';
-		}
+		ClearBuffer(0 * m_nWidth + (BORDER_WIDTH + 1), 0 * m_nWidth + (BORDER_WIDTH + 28));
 		wsprintfW(&m_Screen[0 * m_nWidth + (BORDER_WIDTH + 1)], L"FPS: %d", fps);
 		fps = 0;
 	}
@@ -290,10 +286,15 @@ void TestApp::DisplayFps()
 // displaying main frame containing debug info
 void TestApp::DisplayMainFrame()
 {
+	DisplayFps();
+	for (int i = 1; i < 5; ++i)
+	{
+		ClearBuffer(i * m_nWidth + (BORDER_WIDTH + 1), i * m_nWidth + (BORDER_WIDTH + 28));
+	}
 	wsprintfW(&m_Screen[1 * m_nWidth + (BORDER_WIDTH + 1)], L"SCORE: %d", m_nScore);
 	wsprintfW(&m_Screen[2 * m_nWidth + (BORDER_WIDTH + 1)], L"POSX: %d POSY: %d", m_nPlayerX, m_nPlayerY);
-	wsprintfW(&m_Screen[4 * m_nWidth + (BORDER_WIDTH + 1)], L"LIVES(%d): %s", m_nLives, GetHearts());
-	wsprintfW(&m_Screen[5 * m_nWidth + (BORDER_WIDTH + 1)], L"=====SNAKE BY AGNARES======");
+	wsprintfW(&m_Screen[3 * m_nWidth + (BORDER_WIDTH + 1)], L"LIVES(%d): %s", m_nLives, GetHearts());
+	wsprintfW(&m_Screen[4 * m_nWidth + (BORDER_WIDTH + 1)], L"=====SNAKE BY AGNARES======");
 }
 
 // default writing to a screen buffer called each loop
@@ -314,7 +315,6 @@ void TestApp::Write()
 		}
 	}
 
-	DisplayFps();
 	DisplayMainFrame();
 
 	if (m_bCheckFruitPlayer())
@@ -350,7 +350,7 @@ void TestApp::Run()
 	while (true)
 	{
 		// game restart
-		ClearBuffer();
+		ClearBuffer(0, m_nWidth * m_nHeight);
 
 		m_nPlayerX = BORDER_WIDTH / 2;
 		m_nPlayerY = BORDER_HEIGHT / 2;
