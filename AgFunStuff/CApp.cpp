@@ -98,7 +98,7 @@ bool TestApp::m_bCheckIntersection()
 		for (unsigned int i = 0; i < vTail.size(); ++i)
 		{
 			const std::tuple<int, int>& reftail = vTail[i];
-			if (m_nPlayerX == std::get<0>(reftail) && m_nPlayerY == std::get<1>(reftail))
+			if (std::get<0>(reftail) == m_nPlayerX && std::get<1>(reftail) == m_nPlayerY)
 			{
 				for (unsigned int j = 0; j < i; ++j)
 				{
@@ -170,6 +170,9 @@ void TestApp::CheckHit()
 	// slowing up the game speed and syncing direction
 	if ((std::chrono::system_clock::now() - tp) > (bDirection ? 100ms : 60ms))
 	{
+		// checking if snake cut his body
+		m_bCheckIntersection();
+
 		// snake body part
 		static unsigned int segmentCounter;
 		wsprintfW(&m_Screen[3 * m_nWidth + (BORDER_WIDTH + 1)], L"SEGMENT: %d", segmentCounter);
@@ -285,8 +288,6 @@ void TestApp::DisplayMainFrame()
 // default writing to a screen buffer called each loop
 void TestApp::Write()
 {
-	m_bCheckIntersection();
-
 	for (int i = 0; i < BORDER_WIDTH; ++i)
 	{
 		for (int j = 0; j < BORDER_HEIGHT; ++j)
