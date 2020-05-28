@@ -103,8 +103,6 @@ bool TestApp::m_bCheckIntersection()
 				vTail.pop_back();
 				m_nScore -= SCORE_ADDITION / TAIL_ADDITION;
 			}
-			m_nPlayerX = BORDER_WIDTH / 2;
-			m_nPlayerY = BORDER_HEIGHT / 2;
 			m_nLives -= 1;
 			return true;
 		}
@@ -154,11 +152,26 @@ bool TestApp::m_bCheckDirection(const eHit& eDirection)
 // checking if key is registered and setting a state
 void TestApp::CheckHit()
 {
-	// keyboard catch
-	if (_kbhit())
+	// setting direction true y false x
+	bool bDirection = false;
+	if (m_bCheckDirection(eState))
+		bDirection = true;
+
+	// checking if new timepoint should be created
+	if (m_bCheck)
 	{
-		switch (_getch())
+		tp = std::chrono::system_clock::now();
+		m_bCheck = false;
+	}
+
+	// slowing up the game speed and syncing direction
+	if ((std::chrono::system_clock::now() - tp) > (bDirection ? 100ms : 60ms))
+	{
+		// keyboard catch
+		if (_kbhit())
 		{
+			switch (_getch())
+			{
 			case 'w':
 				if (eState != eHit::DOWN)
 					eState = eHit::UP;
@@ -177,24 +190,9 @@ void TestApp::CheckHit()
 				break;
 			default:
 				break;
+			}
 		}
-	}
 
-	// setting direction true y false x
-	bool bDirection = false;
-	if (m_bCheckDirection(eState))
-		bDirection = true;
-
-	// checking if new timepoint should be created
-	if (m_bCheck)
-	{
-		tp = std::chrono::system_clock::now();
-		m_bCheck = false;
-	}
-
-	// slowing up the game speed and syncing direction
-	if ((std::chrono::system_clock::now() - tp) > (bDirection ? 100ms : 60ms))
-	{
 		// snake body part
 		static unsigned int segmentCounter;
 		wsprintfW(&m_Screen[3 * m_nWidth + (BORDER_WIDTH + 1)], L"SEGMENT: %d", segmentCounter);
@@ -202,7 +200,7 @@ void TestApp::CheckHit()
 		{
 			if (segmentCounter == i)
 			{
-				std::tuple<int, int> &reftail = vTail[i];
+				std::tuple<int, int>& reftail = vTail[i];
 				std::get<0>(reftail) = m_nPlayerX;
 				std::get<1>(reftail) = m_nPlayerY;
 			}
