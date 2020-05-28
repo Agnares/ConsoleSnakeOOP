@@ -93,18 +93,21 @@ bool TestApp::m_bCheckFruitPlayer()
 
 bool TestApp::m_bCheckIntersection()
 {
-	for (unsigned int i = 0; i < vTail.size(); ++i)
+	if (eState != eHit::COUNT)
 	{
-		const std::tuple<int, int> &reftail = vTail[i];
-		if (m_nPlayerX == std::get<0>(reftail) && m_nPlayerY == std::get<1>(reftail))
+		for (unsigned int i = 0; i < vTail.size(); ++i)
 		{
-			for (unsigned int j = 0; j < i; ++j)
+			const std::tuple<int, int>& reftail = vTail[i];
+			if (m_nPlayerX == std::get<0>(reftail) && m_nPlayerY == std::get<1>(reftail))
 			{
-				vTail.pop_back();
-				m_nScore -= SCORE_ADDITION / TAIL_ADDITION;
+				for (unsigned int j = 0; j < i; ++j)
+				{
+					vTail.pop_back();
+					m_nScore -= SCORE_ADDITION / TAIL_ADDITION;
+				}
+				m_nLives -= 1;
+				return true;
 			}
-			m_nLives -= 1;
-			return true;
 		}
 	}
 	return false;
@@ -314,6 +317,7 @@ void TestApp::Write()
 
 	if (m_bCheckBorder(m_nPlayerX, m_nPlayerY))
 	{
+		eState = eHit::COUNT;
 		m_nLives -= 1;
 		m_nPlayerX = BORDER_WIDTH / 2;
 		m_nPlayerY = BORDER_HEIGHT / 2;
