@@ -200,10 +200,6 @@ void TestApp::CheckHit()
 		// snake body part
 		static unsigned int segmentCounter;
 		wsprintfW(&m_Screen[3 * m_nWidth + (BORDER_WIDTH + 1)], L"SEGMENT: %d", segmentCounter);
-		if (segmentCounter > vTail.size() - 1)
-		{
-			segmentCounter = 0;
-		}
 		for (unsigned int i = 0; i < vTail.size(); ++i)
 		{
 			if (segmentCounter == i)
@@ -216,6 +212,10 @@ void TestApp::CheckHit()
 		if (vTail.size() > 0)
 		{
 			segmentCounter++;
+		}
+		if (segmentCounter > vTail.size() - 1)
+		{
+			segmentCounter = 0;
 		}
 
 		// checking state for movement
