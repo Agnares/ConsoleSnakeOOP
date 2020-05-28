@@ -7,6 +7,7 @@
 /*-----SHARE, EDIT, LEARN, DO WHATEVER YOU WANT WITH THIS-----*/
 /*------------------------------------------------------------*/
 
+// basic defines
 #define BORDER_WIDTH	(const int)50
 #define BORDER_HEIGHT	(const int)25
 
@@ -17,6 +18,7 @@
 
 using namespace std::chrono_literals;
 
+// constructor
 TestApp::TestApp(int nWidth, int nHeight)
 : 
 	m_Screen(NULL),
@@ -41,12 +43,14 @@ TestApp::TestApp(int nWidth, int nHeight)
 	ClearBuffer();
 }
 
+// destructor
 TestApp::~TestApp()
 {
 	delete[] m_Hearts;
 	delete[] m_Screen;
 }
 
+// returning wchar_t pointer with hearts
 wchar_t* TestApp::GetHearts()
 {
 	for (unsigned int i = 0; i < m_nLives; ++i)
@@ -60,6 +64,7 @@ wchar_t* TestApp::GetHearts()
 	return m_Hearts;
 }
 
+// creating random seed and generating fruit coordinates where tail is not present
 void TestApp::GenerateFruit()
 {
 	std::random_device dev;
@@ -76,6 +81,7 @@ void TestApp::GenerateFruit()
 	}
 }
 
+// clearing whole buffer length
 void TestApp::ClearBuffer()
 {
 	for (unsigned int i = 0; i < m_nWidth * m_nHeight; ++i)
@@ -84,6 +90,7 @@ void TestApp::ClearBuffer()
 	}
 }
 
+// checking if player head coordinates equal fruit coordinates
 bool TestApp::m_bCheckFruitPlayer()
 {
 	if (m_nPlayerX == m_nFruitX && m_nPlayerY == m_nFruitY)
@@ -91,14 +98,14 @@ bool TestApp::m_bCheckFruitPlayer()
 	return false;
 }
 
+// looping through tail deque and checking if coordinates of player head and tail match or no
 bool TestApp::m_bCheckIntersection()
 {
 	if (eState != eHit::COUNT)
 	{
 		for (unsigned int i = 0; i < vTail.size(); ++i)
 		{
-			const std::tuple<int, int>& reftail = vTail[i];
-			if (std::get<0>(reftail) == m_nPlayerX && std::get<1>(reftail) == m_nPlayerY)
+			if (m_nPlayerX == std::get<0>(vTail[i]) && m_nPlayerY == std::get<1>(vTail[i]))
 			{
 				for (unsigned int j = 0; j < i; ++j)
 				{
@@ -113,6 +120,7 @@ bool TestApp::m_bCheckIntersection()
 	return false;
 }
 
+// checking if fruit coordinates equal buffer width and height
 bool TestApp::m_bCheckFruit(const int& nWidth, const int& nHeight)
 {
 	if (nWidth == m_nFruitX && nHeight == m_nFruitY)
@@ -120,6 +128,7 @@ bool TestApp::m_bCheckFruit(const int& nWidth, const int& nHeight)
 	return false;
 }
 
+// checking if player head has crossed the border line
 bool TestApp::m_bCheckBorder(const int& nWidth, const int& nHeight)
 {
 	if (nWidth < 1 || nHeight < 1 || nWidth > BORDER_WIDTH - 2 || nHeight > BORDER_HEIGHT - 2)
@@ -127,6 +136,7 @@ bool TestApp::m_bCheckBorder(const int& nWidth, const int& nHeight)
 	return false;
 }
 
+// checking if player head coordinates equal buffer width and height same for snake tail
 bool TestApp::m_bCheckPlayer(const int& nWidth, const int& nHeight)
 {
 	if (nWidth == m_nPlayerX && nHeight == m_nPlayerY) 
@@ -158,7 +168,9 @@ void TestApp::CheckHit()
 	// setting direction true y false x
 	bool bDirection = false;
 	if (m_bCheckDirection(eState))
+	{
 		bDirection = true;
+	}
 
 	// checking if new timepoint should be created
 	if (m_bCheck)
@@ -261,14 +273,9 @@ void TestApp::DisplayFps()
 	static int fps;
 	static bool bFirtDisplayFps = false;
 
-	if (!bFirtDisplayFps)
-	{
-		wsprintfW(&m_Screen[0 * m_nWidth + (BORDER_WIDTH + 1)], L"FPS: %d", 0);
-		bFirtDisplayFps = true;
-	}
-
 	fps++;
-	if ((std::chrono::system_clock::now() - tp_fps) > 1000ms)
+
+	if((std::chrono::system_clock::now() - tp_fps) > 1000ms)
 	{
 		tp_fps = std::chrono::system_clock::now();
 		wsprintfW(&m_Screen[0 * m_nWidth + (BORDER_WIDTH + 1)], L"FPS: %d", fps);
@@ -357,7 +364,9 @@ void TestApp::Run()
 			if (_kbhit())
 			{
 				if (_getch() == '\r')
+				{
 					m_bEnd = false;
+				}
 			}
 		}
 
