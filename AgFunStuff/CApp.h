@@ -31,7 +31,7 @@ private:
 private:
 	wchar_t* GetHearts();
 	void GenerateFruit();
-	void ClearBuffer();
+	void ClearBuffer(const int& nFrom, const int& nTo);
 	bool m_bCheckFruitPlayer();
 	bool m_bCheckIntersection();
 	bool m_bCheckFruit(const int& nWidth, const int& nHeight);
