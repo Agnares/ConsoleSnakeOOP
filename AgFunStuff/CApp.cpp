@@ -167,6 +167,27 @@ void TestApp::CheckHit()
 	// slowing up the game speed and syncing direction
 	if ((std::chrono::system_clock::now() - tp) > (bDirection ? 100ms : 60ms))
 	{
+		// snake body part
+		static unsigned int segmentCounter;
+		wsprintfW(&m_Screen[3 * m_nWidth + (BORDER_WIDTH + 1)], L"SEGMENT: %d", segmentCounter);
+		for (unsigned int i = 0; i < vTail.size(); ++i)
+		{
+			if (segmentCounter == i)
+			{
+				std::tuple<int, int>& reftail = vTail[i];
+				std::get<0>(reftail) = m_nPlayerX;
+				std::get<1>(reftail) = m_nPlayerY;
+			}
+		}
+		if (vTail.size() > 0)
+		{
+			segmentCounter++;
+		}
+		if (segmentCounter > vTail.size() - 1)
+		{
+			segmentCounter = 0;
+		}
+
 		// keyboard catch
 		if (_kbhit())
 		{
@@ -191,27 +212,6 @@ void TestApp::CheckHit()
 			default:
 				break;
 			}
-		}
-
-		// snake body part
-		static unsigned int segmentCounter;
-		wsprintfW(&m_Screen[3 * m_nWidth + (BORDER_WIDTH + 1)], L"SEGMENT: %d", segmentCounter);
-		for (unsigned int i = 0; i < vTail.size(); ++i)
-		{
-			if (segmentCounter == i)
-			{
-				std::tuple<int, int>& reftail = vTail[i];
-				std::get<0>(reftail) = m_nPlayerX;
-				std::get<1>(reftail) = m_nPlayerY;
-			}
-		}
-		if (vTail.size() > 0)
-		{
-			segmentCounter++;
-		}
-		if (segmentCounter > vTail.size() - 1)
-		{
-			segmentCounter = 0;
 		}
 
 		// checking state for movement
