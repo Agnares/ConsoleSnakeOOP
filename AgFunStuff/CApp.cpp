@@ -8,7 +8,7 @@
 /*------------------------------------------------------------*/
 
 // basic defines
-#define BORDER_WIDTH	(const int)50
+#define BORDER_WIDTH	(const int)80
 #define BORDER_HEIGHT	(const int)25
 
 #define SCORE_ADDITION  (const int)50
