@@ -91,6 +91,11 @@ void TestApp::ClearBuffer(const int& nFrom, const int& nTo)
 	}
 }
 
+void TestApp::SetColor(const COORD& cCoords, const DWORD& dwLength, const WORD& wAttribute)
+{
+	FillConsoleOutputAttribute(GetHandle(), wAttribute, dwLength, cCoords, &m_dwAttributesWritten);
+}
+
 // checking if player head coordinates equal fruit coordinates
 bool TestApp::m_bCheckFruitPlayer()
 {
@@ -125,7 +130,10 @@ bool TestApp::m_bCheckIntersection()
 bool TestApp::m_bCheckFruit(const int& nWidth, const int& nHeight)
 {
 	if (nWidth == m_nFruitX && nHeight == m_nFruitY)
+	{
+		SetColor({ (SHORT)m_nFruitX, (SHORT)m_nFruitY }, 1, 6);
 		return true;
+	}
 	return false;
 }
 
@@ -269,15 +277,23 @@ void TestApp::DisplayGameOver()
 // displaying main frame containing debug info
 void TestApp::DisplayMainFrame()
 {
-	for (int i = 0; i < 5; ++i)
+	for (int i = 0; i < 4; ++i)
 	{
 		ClearBuffer(i * m_nWidth + (BORDER_WIDTH + 1), i * m_nWidth + (BORDER_WIDTH + 28));
 	}
+
 	wsprintfW(&m_Screen[0 * m_nWidth + (BORDER_WIDTH + 1)], L"SCORE: %d", m_nScore);
-	wsprintfW(&m_Screen[1 * m_nWidth + (BORDER_WIDTH + 1)], L"POSX: %d POSY: %d", m_nPlayerX, m_nPlayerY);
-	wsprintfW(&m_Screen[2 * m_nWidth + (BORDER_WIDTH + 1)], L"LIVES(%d): %s", m_nLives, GetHearts());
-	wsprintfW(&m_Screen[3 * m_nWidth + (BORDER_WIDTH + 1)], L"DIRECTION: %s", eState == eHit::COUNT ? L"[NONE]" : m_bDirection ? (eState == eHit::UP ? L"[UP]" : L"[DOWN]") : (eState == eHit::LEFT ? L"[LEFT]" : L"[RIGHT]"));
-	wsprintfW(&m_Screen[4 * m_nWidth + (BORDER_WIDTH + 1)], L"=====SNAKE BY AGNARES======"); 
+	wsprintfW(&m_Screen[1 * m_nWidth + (BORDER_WIDTH + 1)], L"LIVES: %s", GetHearts());
+	wsprintfW(&m_Screen[2 * m_nWidth + (BORDER_WIDTH + 1)], L"DIRECTION: %s", eState == eHit::COUNT ? L"[NONE]" : m_bDirection ? (eState == eHit::UP ? L"[UP]" : L"[DOWN]") : (eState == eHit::LEFT ? L"[LEFT]" : L"[RIGHT]"));
+	wsprintfW(&m_Screen[3 * m_nWidth + (BORDER_WIDTH + 1)], L"=====SNAKE BY AGNARES======");
+
+	SetColor({ (BORDER_WIDTH + 1), 0 }, 6, 9);		// blue score text
+	SetColor({ (BORDER_WIDTH + 8), 0 }, 10, 11);	// light blue score
+	SetColor({ (BORDER_WIDTH + 1), 1 }, 6, 9);		// blue lives text
+	SetColor({ (BORDER_WIDTH + 8), 1 }, 3, 5);		// purple lives
+	SetColor({ (BORDER_WIDTH + 1), 2 }, 10, 9);		// blue direction test
+	SetColor({ (BORDER_WIDTH + 11), 2 }, 10, 2);	// green direction
+	SetColor({ (BORDER_WIDTH + 1), 3 }, 28, 4);		// red agnares text
 }
 
 // default writing to a screen buffer called each loop
@@ -287,14 +303,24 @@ void TestApp::Write()
 	{
 		for (int j = 0; j < BORDER_HEIGHT; ++j)
 		{
-			if (m_bCheckBorder(i, j))
+			if (m_bCheckBorder(i, j)) 
+			{
+				SetColor({ (SHORT)i, (SHORT)j }, 1, 15);
 				m_Screen[j * m_nWidth + i] = '#';
+			}
 			else if (m_bCheckPlayer(i, j))
+			{
 				m_Screen[j * m_nWidth + i] = m_bSnakeBody ? 'o' : 'O';
+				SetColor({ (SHORT)i, (SHORT)j }, 1, m_bSnakeBody ? 6 : 4);
+			}
 			else if (m_bCheckFruit(i, j))
+			{
 				m_Screen[j * m_nWidth + i] = 'F';
+			}
 			else
+			{
 				m_Screen[j * m_nWidth + i] = ' ';
+			}
 		}
 	}
 
@@ -302,6 +328,7 @@ void TestApp::Write()
 
 	if (m_bCheckFruitPlayer())
 	{
+		SetColor({ (SHORT)m_nFruitX, (SHORT)m_nFruitY }, 1, 7);
 		GenerateFruit();
 		m_nScore += SCORE_ADDITION;
 		for (int i = 0; i < TAIL_ADDITION; ++i)
