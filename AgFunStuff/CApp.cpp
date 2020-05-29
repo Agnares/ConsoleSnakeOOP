@@ -272,6 +272,11 @@ void TestApp::DisplayGameOver()
 	wsprintfW(&m_Screen[12 * m_nWidth + 40], L" GAMEOVER PRESS ENTER TO PLAY AGAIN!" );
 	wsprintfW(&m_Screen[13 * m_nWidth + 40], L" YOUR SCORE: %d", m_nScore		     );
 	wsprintfW(&m_Screen[14 * m_nWidth + 40], L"+-----------------------------------+");
+
+	for (int i = 0; i < 4; ++i)
+	{
+		SetColor({ 40, 11 + (SHORT)i }, 38, 4);
+	}
 }
 
 // displaying main frame containing debug info
