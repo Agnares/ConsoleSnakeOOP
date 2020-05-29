@@ -34,6 +34,7 @@ TestApp::TestApp(int nWidth, int nHeight)
 	m_nScore = 0;
 	m_nLives = TOTAL_LIVES;
 	eState = eHit::COUNT;
+	m_bDirection = true;
 	m_bCheck = true;
 	m_bSnakeBody = false;
 
@@ -166,10 +167,10 @@ bool TestApp::m_bCheckDirection(const eHit& eDirection)
 void TestApp::CheckHit()
 {
 	// setting direction true y false x
-	bool bDirection = false;
+	m_bDirection = false;
 	if (m_bCheckDirection(eState))
 	{
-		bDirection = true;
+		m_bDirection = true;
 	}
 
 	// checking if new timepoint should be created
@@ -180,7 +181,7 @@ void TestApp::CheckHit()
 	}
 
 	// slowing up the game speed and syncing direction
-	if ((std::chrono::system_clock::now() - tp) > (bDirection ? 100ms : 60ms))
+	if ((std::chrono::system_clock::now() - tp) > (m_bDirection ? 100ms : 60ms))
 	{
 		// checking if snake cut his body
 		m_bCheckIntersection();
@@ -265,36 +266,18 @@ void TestApp::DisplayGameOver()
 	wsprintfW(&m_Screen[14 * m_nWidth + 40], L"+-----------------------------------+");
 }
 
-// displaying chrono fps
-void TestApp::DisplayFps()
-{
-	static auto tp_fps = std::chrono::system_clock::now();
-	static int fps;
-	static bool bFirtDisplayFps = false;
-
-	fps++;
-
-	if((std::chrono::system_clock::now() - tp_fps) > 1000ms)
-	{
-		tp_fps = std::chrono::system_clock::now();
-		ClearBuffer(0 * m_nWidth + (BORDER_WIDTH + 1), 0 * m_nWidth + (BORDER_WIDTH + 28));
-		wsprintfW(&m_Screen[0 * m_nWidth + (BORDER_WIDTH + 1)], L"FPS: %d", fps);
-		fps = 0;
-	}
-}
-
 // displaying main frame containing debug info
 void TestApp::DisplayMainFrame()
 {
-	DisplayFps();
-	for (int i = 1; i < 5; ++i)
+	for (int i = 0; i < 5; ++i)
 	{
 		ClearBuffer(i * m_nWidth + (BORDER_WIDTH + 1), i * m_nWidth + (BORDER_WIDTH + 28));
 	}
-	wsprintfW(&m_Screen[1 * m_nWidth + (BORDER_WIDTH + 1)], L"SCORE: %d", m_nScore);
-	wsprintfW(&m_Screen[2 * m_nWidth + (BORDER_WIDTH + 1)], L"POSX: %d POSY: %d", m_nPlayerX, m_nPlayerY);
-	wsprintfW(&m_Screen[3 * m_nWidth + (BORDER_WIDTH + 1)], L"LIVES(%d): %s", m_nLives, GetHearts());
-	wsprintfW(&m_Screen[4 * m_nWidth + (BORDER_WIDTH + 1)], L"=====SNAKE BY AGNARES======");
+	wsprintfW(&m_Screen[0 * m_nWidth + (BORDER_WIDTH + 1)], L"SCORE: %d", m_nScore);
+	wsprintfW(&m_Screen[1 * m_nWidth + (BORDER_WIDTH + 1)], L"POSX: %d POSY: %d", m_nPlayerX, m_nPlayerY);
+	wsprintfW(&m_Screen[2 * m_nWidth + (BORDER_WIDTH + 1)], L"LIVES(%d): %s", m_nLives, GetHearts());
+	wsprintfW(&m_Screen[3 * m_nWidth + (BORDER_WIDTH + 1)], L"DIRECTION: %s", eState == eHit::COUNT ? L"[NONE]" : m_bDirection ? (eState == eHit::UP ? L"[UP]" : L"[DOWN]") : (eState == eHit::LEFT ? L"[LEFT]" : L"[RIGHT]"));
+	wsprintfW(&m_Screen[4 * m_nWidth + (BORDER_WIDTH + 1)], L"=====SNAKE BY AGNARES======"); 
 }
 
 // default writing to a screen buffer called each loop
@@ -355,6 +338,7 @@ void TestApp::Run()
 		m_nPlayerX = BORDER_WIDTH / 2;
 		m_nPlayerY = BORDER_HEIGHT / 2;
 		eState = eHit::COUNT;
+		m_bDirection = true;
 		m_bCheck = true;
 		m_bSnakeBody = false;
 		m_nScore = 0;
