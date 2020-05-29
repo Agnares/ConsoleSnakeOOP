@@ -293,7 +293,7 @@ void TestApp::DisplayMainFrame()
 	SetColor({ (BORDER_WIDTH + 8), 1 }, 3, 5);		// purple lives
 	SetColor({ (BORDER_WIDTH + 1), 2 }, 10, 9);		// blue direction test
 	SetColor({ (BORDER_WIDTH + 11), 2 }, 10, 2);	// green direction
-	SetColor({ (BORDER_WIDTH + 1), 3 }, 28, 4);		// red agnares text
+	SetColor({ (BORDER_WIDTH + 1), 3 }, 28, 14);		// red agnares text
 }
 
 // default writing to a screen buffer called each loop
@@ -305,13 +305,13 @@ void TestApp::Write()
 		{
 			if (m_bCheckBorder(i, j)) 
 			{
-				SetColor({ (SHORT)i, (SHORT)j }, 1, 15);
-				m_Screen[j * m_nWidth + i] = '#';
+				SetColor({ (SHORT)i, (SHORT)j }, 1, 4);
+				m_Screen[j * m_nWidth + i] = '*';
 			}
 			else if (m_bCheckPlayer(i, j))
 			{
 				m_Screen[j * m_nWidth + i] = m_bSnakeBody ? 'o' : 'O';
-				SetColor({ (SHORT)i, (SHORT)j }, 1, m_bSnakeBody ? 6 : 4);
+				SetColor({ (SHORT)i, (SHORT)j }, 1, m_bSnakeBody ? 2 : 10);
 			}
 			else if (m_bCheckFruit(i, j))
 			{
