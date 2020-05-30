@@ -38,6 +38,8 @@ TestApp::TestApp(int nWidth, int nHeight)
 	m_bCheck = true;
 	m_bSnakeBody = false;
 
+	vHighscore.push_back(0);
+
 	m_Hearts = new wchar_t[m_nLives];
 	m_Screen = new wchar_t[m_nWidth * m_nHeight];
 
@@ -91,6 +93,7 @@ void TestApp::ClearBuffer(const int& nFrom, const int& nTo)
 	}
 }
 
+// setting color to output buffer
 void TestApp::SetColor(const COORD& cCoords, const DWORD& dwLength, const WORD& wAttribute)
 {
 	FillConsoleOutputAttribute(GetHandle(), wAttribute, dwLength, cCoords, &m_dwAttributesWritten);
@@ -189,7 +192,7 @@ void TestApp::CheckHit()
 	}
 
 	// slowing up the game speed and syncing direction
-	if ((std::chrono::system_clock::now() - tp) > (m_bDirection ? 100ms : 60ms))
+	if ((std::chrono::system_clock::now() - tp) > (m_bDirection ? 60ms : 30ms))
 	{
 		// checking if snake cut his body
 		m_bCheckIntersection();
@@ -277,28 +280,38 @@ void TestApp::DisplayGameOver()
 	{
 		SetColor({ 40, 11 + (SHORT)i }, 38, 4);
 	}
+
+	vHighscore.push_back(m_nScore);
 }
 
 // displaying main frame containing debug info
 void TestApp::DisplayMainFrame()
 {
-	for (int i = 0; i < 4; ++i)
+	SHORT nOffset = 0;
+	SHORT nParamTextLength = 28;
+
+	for (int i = 0; i < nOffset + 5; ++i)
 	{
-		ClearBuffer(i * m_nWidth + (BORDER_WIDTH + 1), i * m_nWidth + (BORDER_WIDTH + 28));
+		ClearBuffer(i * m_nWidth + (BORDER_WIDTH + 1), i * m_nWidth + (BORDER_WIDTH + nParamTextLength));
 	}
 
-	wsprintfW(&m_Screen[0 * m_nWidth + (BORDER_WIDTH + 1)], L"SCORE: %d", m_nScore);
-	wsprintfW(&m_Screen[1 * m_nWidth + (BORDER_WIDTH + 1)], L"LIVES: %s", GetHearts());
-	wsprintfW(&m_Screen[2 * m_nWidth + (BORDER_WIDTH + 1)], L"DIRECTION: %s", eState == eHit::COUNT ? L"[NONE]" : m_bDirection ? (eState == eHit::UP ? L"[UP]" : L"[DOWN]") : (eState == eHit::LEFT ? L"[LEFT]" : L"[RIGHT]"));
-	wsprintfW(&m_Screen[3 * m_nWidth + (BORDER_WIDTH + 1)], L"=====SNAKE BY AGNARES======");
+	wsprintfW(&m_Screen[(nOffset + 0) * m_nWidth + (BORDER_WIDTH + 1)], L"SCORE: %d", m_nScore);
+	wsprintfW(&m_Screen[(nOffset + 1) * m_nWidth + (BORDER_WIDTH + 1)], L"HIGHSCORE: %d FROM %d", *std::max_element(vHighscore.begin(), vHighscore.end()), vHighscore.size() - 1);
+	wsprintfW(&m_Screen[(nOffset + 2) * m_nWidth + (BORDER_WIDTH + 1)], L"LIVES: %s", GetHearts());
+	wsprintfW(&m_Screen[(nOffset + 3) * m_nWidth + (BORDER_WIDTH + 1)], L"DIRECTION: %s", eState == eHit::COUNT ? L"[NONE]" : m_bDirection ? (eState == eHit::UP ? L"[UP]" : L"[DOWN]") : (eState == eHit::LEFT ? L"[LEFT]" : L"[RIGHT]"));
+	wsprintfW(&m_Screen[(nOffset + 4) * m_nWidth + (BORDER_WIDTH + 1)], L"=====SNAKE BY AGNARES======");
 
-	SetColor({ (BORDER_WIDTH + 1), 0 }, 6, 9);		// blue score text
-	SetColor({ (BORDER_WIDTH + 8), 0 }, 10, 11);	// light blue score
-	SetColor({ (BORDER_WIDTH + 1), 1 }, 6, 9);		// blue lives text
-	SetColor({ (BORDER_WIDTH + 8), 1 }, 3, 5);		// purple lives
-	SetColor({ (BORDER_WIDTH + 1), 2 }, 10, 9);		// blue direction test
-	SetColor({ (BORDER_WIDTH + 11), 2 }, 10, 2);	// green direction
-	SetColor({ (BORDER_WIDTH + 1), 3 }, 28, 14);		// red agnares text
+	SetColor({ (BORDER_WIDTH + 1 ), nOffset + 0 }, 6, 9);						// blue score text
+	SetColor({ (BORDER_WIDTH + 8 ), nOffset + 0 }, nParamTextLength, 11);		// light blue score
+	SetColor({ (BORDER_WIDTH + 1 ), nOffset + 1 }, 10, 9);						// blue highscore text
+	SetColor({ (BORDER_WIDTH + 11), nOffset + 1 }, nParamTextLength, 11);		// blue highscore
+	SetColor({ (BORDER_WIDTH + 1 ), nOffset + 2 }, 6, 9);						// blue lives text
+	SetColor({ (BORDER_WIDTH + 8 ), nOffset + 2 }, nParamTextLength, 5);		// purple lives
+	SetColor({ (BORDER_WIDTH + 1 ), nOffset + 3 }, 10, 9);						// blue direction text
+	SetColor({ (BORDER_WIDTH + 11), nOffset + 3 }, nParamTextLength, 2);		// green direction
+
+	// agnares signature
+	SetColor({ (BORDER_WIDTH + 1 ), nOffset + 4 }, nParamTextLength, 14);
 }
 
 // default writing to a screen buffer called each loop
@@ -315,8 +328,8 @@ void TestApp::Write()
 			}
 			else if (m_bCheckPlayer(i, j))
 			{
-				m_Screen[j * m_nWidth + i] = m_bSnakeBody ? 'o' : 'O';
 				SetColor({ (SHORT)i, (SHORT)j }, 1, m_bSnakeBody ? 2 : 10);
+				m_Screen[j * m_nWidth + i] = m_bSnakeBody ? 'o' : 'O';
 			}
 			else if (m_bCheckFruit(i, j))
 			{

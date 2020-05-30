@@ -15,18 +15,24 @@ private:
 private:
 	wchar_t* m_Hearts;
 	wchar_t* m_Screen;
+
 	DWORD m_dwBytesWritten;
 	DWORD m_dwAttributesWritten;
+
 	unsigned int m_nWidth, m_nHeight;
 	unsigned int m_nPlayerX, m_nPlayerY;
 	unsigned int m_nFruitX, m_nFruitY;
+	unsigned int m_nScore;
+	unsigned int m_nLives;
+
 	bool m_bEnd;
 	bool m_bDirection;
 	bool m_bCheck;
-	unsigned int m_nScore;
-	unsigned int m_nLives;
-	std::deque<std::tuple<int, int>> vTail;
 	bool m_bSnakeBody;
+
+	std::deque<std::tuple<int, int>> vTail;
+	std::deque<int> vHighscore;
+
 	eHit eState;
 	std::chrono::system_clock::time_point tp;
 
