@@ -15,6 +15,7 @@
 #define TAIL_ADDITION	(const int)1
 
 #define TOTAL_LIVES		(const int)3
+#define HEART_RANDOM_OF	(const int)6
 
 using namespace std::chrono_literals;
 
@@ -31,12 +32,15 @@ TestApp::TestApp(int nWidth, int nHeight)
 	m_nPlayerY = 0;
 	m_nFruitX = 0;
 	m_nFruitY = 0;
+	m_nHeartX = 0;
+	m_nHeartY = 0;
 	m_nScore = 0;
 	m_nLives = TOTAL_LIVES;
 	eState = eHit::COUNT;
 	m_bDirection = true;
 	m_bCheck = true;
 	m_bSnakeBody = false;
+	m_bAvailableHeart = false;
 
 	vHighscore.push_back(0);
 
@@ -84,6 +88,28 @@ void TestApp::GenerateFruit()
 	}
 }
 
+// creating random seed and generating heart coordinates where tail is not present
+void TestApp::GenerateHeart()
+{
+	if (m_nLives < TOTAL_LIVES)
+	{
+		std::random_device dev;
+		std::mt19937 rng(dev());
+		std::uniform_int_distribution<std::mt19937::result_type> dist_width(1, BORDER_WIDTH - 2);
+		std::uniform_int_distribution<std::mt19937::result_type> dist_height(1, BORDER_HEIGHT - 2);
+		std::uniform_int_distribution<std::mt19937::result_type> dist_availability(1, HEART_RANDOM_OF);
+		m_nHeartX = dist_width(rng);
+		m_nHeartY = dist_height(rng);
+		dist_availability(rng) == unsigned int(true) ? (m_bAvailableHeart = true) : (m_bAvailableHeart = false);
+		for (unsigned int i = 0; i < vTail.size(); ++i)
+		{
+			const std::tuple<int, int>& reftail = vTail[i];
+			if (m_nHeartX == std::get<0>(reftail) && m_nHeartY == std::get<1>(reftail))
+				GenerateHeart();
+		}
+	}
+}
+
 // clearing whole buffer length
 void TestApp::ClearBuffer(const int& nFrom, const int& nTo)
 {
@@ -103,6 +129,14 @@ void TestApp::SetColor(const COORD& cCoords, const DWORD& dwLength, const WORD& 
 bool TestApp::m_bCheckFruitPlayer()
 {
 	if (m_nPlayerX == m_nFruitX && m_nPlayerY == m_nFruitY)
+		return true;
+	return false;
+}
+
+// checking if player head coordinates equal heart coordinates
+bool TestApp::m_bCheckHeartPlayer()
+{
+	if ((m_nPlayerX == m_nHeartX && m_nPlayerY == m_nHeartY) && m_bAvailableHeart == true)
 		return true;
 	return false;
 }
@@ -135,6 +169,20 @@ bool TestApp::m_bCheckFruit(const int& nWidth, const int& nHeight)
 	if (nWidth == m_nFruitX && nHeight == m_nFruitY)
 	{
 		SetColor({ (SHORT)m_nFruitX, (SHORT)m_nFruitY }, 1, 6);
+		return true;
+	}
+	return false;
+}
+
+// checking if heart coordinates equal buffer width and height
+bool TestApp::m_bCheckHeart(const int& nWidth, const int& nHeight)
+{
+	if (nWidth == m_nHeartX && nHeight == m_nHeartY)
+	{
+		if (m_bAvailableHeart)
+		{
+			SetColor({ (SHORT)m_nHeartX, (SHORT)m_nHeartY }, 1, 5);
+		}
 		return true;
 	}
 	return false;
@@ -335,6 +383,13 @@ void TestApp::Write()
 			{
 				m_Screen[j * m_nWidth + i] = 'F';
 			}
+			else if (m_bCheckHeart(i, j))
+			{
+				if (m_bAvailableHeart)
+				{
+					m_Screen[j * m_nWidth + i] = *L"\u2665";
+				}
+			}
 			else
 			{
 				m_Screen[j * m_nWidth + i] = ' ';
@@ -346,12 +401,28 @@ void TestApp::Write()
 
 	if (m_bCheckFruitPlayer())
 	{
+		m_nScore += SCORE_ADDITION;
 		SetColor({ (SHORT)m_nFruitX, (SHORT)m_nFruitY }, 1, 7);
 		GenerateFruit();
-		m_nScore += SCORE_ADDITION;
+		if (!m_bAvailableHeart)
+		{
+			GenerateHeart();
+		}
 		for (int i = 0; i < TAIL_ADDITION; ++i)
 		{
 			vTail.push_back(std::make_tuple(0, 0));
+		}
+	}
+
+	if (m_bCheckHeartPlayer())
+	{
+		m_bAvailableHeart = false;
+		if (m_nLives < TOTAL_LIVES)
+		{
+			m_nHeartX = 0;
+			m_nHeartY = 0;
+			m_nLives += 1;
+			GenerateHeart();
 		}
 	}
 
@@ -386,10 +457,12 @@ void TestApp::Run()
 		m_bDirection = true;
 		m_bCheck = true;
 		m_bSnakeBody = false;
+		m_bAvailableHeart = false;
 		m_nScore = 0;
 		m_nLives = TOTAL_LIVES;
 
 		GenerateFruit();
+		GenerateHeart();
 
 		// idling for user input for a new run
 		while (m_bEnd)
