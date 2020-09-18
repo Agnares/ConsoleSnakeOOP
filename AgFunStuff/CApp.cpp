@@ -14,7 +14,7 @@
 #define SCORE_ADDITION  (const int)50
 #define TAIL_ADDITION	(const int)1
 
-#define TOTAL_LIVES		(const int)3
+#define TOTAL_LIVES	(const int)3
 #define HEART_RANDOM_OF	(const int)6
 
 using namespace std::chrono_literals;
